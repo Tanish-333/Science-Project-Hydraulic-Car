@@ -1,137 +1,135 @@
 /*
  * ============================================================
  *  HYDRAULIC CAR - SCIENCE PROJECT
- *  2-Wheel Car Motor Control
+ *  2-Wheel Car with 2 DC Motors
  * ============================================================
  *
  *  Setup:
- *    - 1 motor on the LEFT side
- *    - 1 motor on the RIGHT side
- *    - L298N motor driver controls both side motors
+ *    - 1 DC motor on LEFT wheel
+ *    - 1 DC motor on RIGHT wheel
+ *    - L298N motor driver controls both motors
  *    - Arduino sends the signals, battery powers the motors
  *
  *  WIRING (Arduino UNO  ->  L298N motor driver):
- *  ------------------------------------------------------------
- *    L298N ENA  ->  Arduino pin 5   (speed for LEFT motor)
- *    L298N IN1  ->  Arduino pin 6   (left motor direction)
- *    L298N IN2  ->  Arduino pin 7   (left motor direction)
+ *  ============================================================
+ *    Arduino GND        ->  L298N GND
+ *    Arduino pin 5 (PWM) -> L298N ENA  (LEFT motor speed)
+ *    Arduino pin 6      ->  L298N IN1  (LEFT motor direction)
+ *    Arduino pin 7      ->  L298N IN2  (LEFT motor direction)
+ *    Arduino pin 8      ->  L298N IN3  (RIGHT motor direction)
+ *    Arduino pin 9      ->  L298N IN4  (RIGHT motor direction)
+ *    Arduino pin 10 (PWM)-> L298N ENB  (RIGHT motor speed)
  *
- *    L298N IN3  ->  Arduino pin 8   (right motor direction)
- *    L298N IN4  ->  Arduino pin 9   (right motor direction)
- *    L298N ENB  ->  Arduino pin 10  (speed for RIGHT motor)
+ *  L298N to Motors & Battery:
+ *  ============================================================
+ *    L298N OUT1 / OUT2  ->  LEFT motor
+ *    L298N OUT3 / OUT4  ->  RIGHT motor
+ *    L298N +12V         ->  Battery + (6-12V)
+ *    L298N GND          ->  Battery - AND Arduino GND (MUST connect!)
  *
- *    L298N OUT1 / OUT2  ->  LEFT side motor
- *    L298N OUT3 / OUT4  ->  RIGHT side motor
- *
- *    L298N +12V (or VS) ->  Battery +   (use a 6-12V battery pack)
- *    L298N GND          ->  Battery -  AND  Arduino GND  (shared!)
- *    L298N 5V           ->  Arduino 5V  (only if you removed the jumper)
- *
- *  IMPORTANT: The battery GND and the Arduino GND MUST be connected
- *  together, or the motors will not work.
- *
- *  NOTE: ENA and ENB MUST be PWM pins (the ones with a ~ symbol)
- *  so we can control the speed. On the UNO those are 5, 6, 9, 10, 11, 3.
  * ============================================================
  */
 
-// ---------- LEFT side motor pins ----------
-const int ENA = 5;   // speed (PWM)
-const int IN1 = 6;
-const int IN2 = 7;
+// Motor pins
+const int LEFT_SPEED = 5;    // ENA pin (PWM for speed)
+const int LEFT_DIR1 = 6;     // IN1 pin
+const int LEFT_DIR2 = 7;     // IN2 pin
 
-// ---------- RIGHT side motor pins ----------
-const int IN3 = 8;
-const int IN4 = 9;
-const int ENB = 10;  // speed (PWM)
+const int RIGHT_DIR1 = 8;    // IN3 pin
+const int RIGHT_DIR2 = 9;    // IN4 pin
+const int RIGHT_SPEED = 10;  // ENB pin (PWM for speed)
 
-// ---------- Speed setting ----------
-// PWM value from 0 (stopped) to 255 (full speed).
-// 200 is a good, strong, steady speed for a small car.
-// Lower this number if the car is too fast, raise it (max 255) if too slow.
-const int CAR_SPEED = 200;
-
+// Speed (0-255, where 255 is full speed)
+const int SPEED = 200;
 
 void setup() {
-  // Tell the Arduino all these pins are outputs
-  pinMode(ENA, OUTPUT);
-  pinMode(IN1, OUTPUT);
-  pinMode(IN2, OUTPUT);
-  pinMode(IN3, OUTPUT);
-  pinMode(IN4, OUTPUT);
-  pinMode(ENB, OUTPUT);
+  // Set all pins as outputs
+  pinMode(LEFT_SPEED, OUTPUT);
+  pinMode(LEFT_DIR1, OUTPUT);
+  pinMode(LEFT_DIR2, OUTPUT);
+  pinMode(RIGHT_DIR1, OUTPUT);
+  pinMode(RIGHT_DIR2, OUTPUT);
+  pinMode(RIGHT_SPEED, OUTPUT);
 
-  // Start with the car stopped so it doesn't jump on power-up
-  stopCar();
+  stopCar();  // Start with motors stopped
 }
-
 
 void loop() {
-  // Drive the car forward at a good steady speed.
-  moveForward();
+  moveForward();   // Go forward
+  delay(3000);     // For 3 seconds
 
-  // The car keeps moving forward as long as it has power.
-  // (If you want it to do something else, see the functions below.)
+  stopCar();       // Stop
+  delay(1000);     // Wait 1 second
+
+  moveBackward();  // Go backward
+  delay(3000);     // For 3 seconds
+
+  stopCar();       // Stop
+  delay(1000);     // Wait 1 second
+
+  turnLeft();      // Turn left
+  delay(2000);     // For 2 seconds
+
+  stopCar();       // Stop
+  delay(1000);     // Wait 1 second
+
+  turnRight();     // Turn right
+  delay(2000);     // For 2 seconds
+
+  stopCar();       // Stop
+  delay(1000);     // Wait 1 second
 }
 
-
-// ============================================================
-//  MOVEMENT FUNCTIONS
-//  Mix and match these in loop() to control how the car drives.
-// ============================================================
-
-// Drive straight forward (both wheels spin forward)
+// Go forward (both motors forward)
 void moveForward() {
-  // LEFT motor forward
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
-  analogWrite(ENA, CAR_SPEED);
+  digitalWrite(LEFT_DIR1, HIGH);
+  digitalWrite(LEFT_DIR2, LOW);
+  analogWrite(LEFT_SPEED, SPEED);
 
-  // RIGHT motor forward
-  digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);
-  analogWrite(ENB, CAR_SPEED);
+  digitalWrite(RIGHT_DIR1, HIGH);
+  digitalWrite(RIGHT_DIR2, LOW);
+  analogWrite(RIGHT_SPEED, SPEED);
 }
 
-// Drive straight backward (both wheels spin backward)
+// Go backward (both motors backward)
 void moveBackward() {
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
-  analogWrite(ENA, CAR_SPEED);
+  digitalWrite(LEFT_DIR1, LOW);
+  digitalWrite(LEFT_DIR2, HIGH);
+  analogWrite(LEFT_SPEED, SPEED);
 
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, HIGH);
-  analogWrite(ENB, CAR_SPEED);
+  digitalWrite(RIGHT_DIR1, LOW);
+  digitalWrite(RIGHT_DIR2, HIGH);
+  analogWrite(RIGHT_SPEED, SPEED);
 }
 
-// Turn left (left wheel backward, right wheel forward)
+// Turn left (left motor slow/backward, right motor forward)
 void turnLeft() {
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
-  analogWrite(ENA, CAR_SPEED);
+  digitalWrite(LEFT_DIR1, LOW);
+  digitalWrite(LEFT_DIR2, HIGH);
+  analogWrite(LEFT_SPEED, SPEED / 2);  // Slower
 
-  digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);
-  analogWrite(ENB, CAR_SPEED);
+  digitalWrite(RIGHT_DIR1, HIGH);
+  digitalWrite(RIGHT_DIR2, LOW);
+  analogWrite(RIGHT_SPEED, SPEED);
 }
 
-// Turn right (left wheel forward, right wheel backward)
+// Turn right (left motor forward, right motor slow/backward)
 void turnRight() {
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
-  analogWrite(ENA, CAR_SPEED);
+  digitalWrite(LEFT_DIR1, HIGH);
+  digitalWrite(LEFT_DIR2, LOW);
+  analogWrite(LEFT_SPEED, SPEED);
 
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, HIGH);
-  analogWrite(ENB, CAR_SPEED);
+  digitalWrite(RIGHT_DIR1, LOW);
+  digitalWrite(RIGHT_DIR2, HIGH);
+  analogWrite(RIGHT_SPEED, SPEED / 2);  // Slower
 }
 
 // Stop both motors
 void stopCar() {
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, LOW);
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, LOW);
-  analogWrite(ENA, 0);
-  analogWrite(ENB, 0);
+  digitalWrite(LEFT_DIR1, LOW);
+  digitalWrite(LEFT_DIR2, LOW);
+  digitalWrite(RIGHT_DIR1, LOW);
+  digitalWrite(RIGHT_DIR2, LOW);
+  analogWrite(LEFT_SPEED, 0);
+  analogWrite(RIGHT_SPEED, 0);
 }
