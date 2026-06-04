@@ -1,13 +1,13 @@
 /*
  * ============================================================
  *  HYDRAULIC CAR - SCIENCE PROJECT
- *  3-Wheel Car Motor Control
+ *  2-Wheel Car Motor Control
  * ============================================================
  *
  *  Setup:
- *    - 2 driven wheels at the BACK  (each has its own DC motor)
- *    - 1 free caster wheel at the FRONT (no motor)
- *    - L298N motor driver controls both back motors
+ *    - 1 motor on the LEFT side
+ *    - 1 motor on the RIGHT side
+ *    - L298N motor driver controls both side motors
  *    - Arduino sends the signals, battery powers the motors
  *
  *  WIRING (Arduino UNO  ->  L298N motor driver):
@@ -20,8 +20,8 @@
  *    L298N IN4  ->  Arduino pin 9   (right motor direction)
  *    L298N ENB  ->  Arduino pin 10  (speed for RIGHT motor)
  *
- *    L298N OUT1 / OUT2  ->  LEFT back motor
- *    L298N OUT3 / OUT4  ->  RIGHT back motor
+ *    L298N OUT1 / OUT2  ->  LEFT side motor
+ *    L298N OUT3 / OUT4  ->  RIGHT side motor
  *
  *    L298N +12V (or VS) ->  Battery +   (use a 6-12V battery pack)
  *    L298N GND          ->  Battery -  AND  Arduino GND  (shared!)
@@ -35,12 +35,12 @@
  * ============================================================
  */
 
-// ---------- LEFT back motor pins ----------
+// ---------- LEFT side motor pins ----------
 const int ENA = 5;   // speed (PWM)
 const int IN1 = 6;
 const int IN2 = 7;
 
-// ---------- RIGHT back motor pins ----------
+// ---------- RIGHT side motor pins ----------
 const int IN3 = 8;
 const int IN4 = 9;
 const int ENB = 10;  // speed (PWM)
@@ -80,7 +80,7 @@ void loop() {
 //  Mix and match these in loop() to control how the car drives.
 // ============================================================
 
-// Drive straight forward
+// Drive straight forward (both wheels spin forward)
 void moveForward() {
   // LEFT motor forward
   digitalWrite(IN1, HIGH);
@@ -93,7 +93,7 @@ void moveForward() {
   analogWrite(ENB, CAR_SPEED);
 }
 
-// Drive straight backward
+// Drive straight backward (both wheels spin backward)
 void moveBackward() {
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, HIGH);
@@ -104,26 +104,26 @@ void moveBackward() {
   analogWrite(ENB, CAR_SPEED);
 }
 
-// Turn left (right wheel spins, left wheel stops)
+// Turn left (left wheel backward, right wheel forward)
 void turnLeft() {
   digitalWrite(IN1, LOW);
-  digitalWrite(IN2, LOW);
-  analogWrite(ENA, 0);
+  digitalWrite(IN2, HIGH);
+  analogWrite(ENA, CAR_SPEED);
 
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
   analogWrite(ENB, CAR_SPEED);
 }
 
-// Turn right (left wheel spins, right wheel stops)
+// Turn right (left wheel forward, right wheel backward)
 void turnRight() {
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
   analogWrite(ENA, CAR_SPEED);
 
   digitalWrite(IN3, LOW);
-  digitalWrite(IN4, LOW);
-  analogWrite(ENB, 0);
+  digitalWrite(IN4, HIGH);
+  analogWrite(ENB, CAR_SPEED);
 }
 
 // Stop both motors
