@@ -31,8 +31,8 @@ const int LEFT_CONTROL = 3;    // L298N IN2 (LEFT motor)
 const int RIGHT_DIR = 4;       // L298N IN3 (RIGHT motor direction)
 const int RIGHT_SPEED = 5;     // L298N IN4 (RIGHT motor speed)
 
-// Speed (0-255)
-const int SPEED = 180;
+// Speed (0-255) - MAX SPEED!
+const int SPEED = 255;
 
 void setup() {
   // Set motor pins as outputs
@@ -45,18 +45,18 @@ void setup() {
   Serial.println("HYDRAULIC CAR - 2 WHEEL TEST");
   Serial.println("LEFT Motor:  Pin 3 (IN2)");
   Serial.println("RIGHT Motor: Pin 4 (IN3), Pin 5 (IN4)");
-  Serial.println("Speed: 180/255");
+  Serial.println("Speed: 255/255 - MAXIMUM SPEED!");
   Serial.println("================================================");
-  Serial.println("Car driving BACKWARD...");
+  Serial.println("Car driving BACKWARD at MAX SPEED...");
 }
 
 void loop() {
-  // Both motors drive backward
+  // Both motors drive backward at maximum speed
   moveBackward();
-  delay(100);
+  delay(50);
 }
 
-// Drive both wheels backward
+// Drive both wheels backward at maximum speed
 void moveBackward() {
   // LEFT motor backward
   digitalWrite(LEFT_CONTROL, LOW);
