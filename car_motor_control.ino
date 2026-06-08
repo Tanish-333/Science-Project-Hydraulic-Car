@@ -47,22 +47,22 @@ void setup() {
   Serial.println("RIGHT Motor: Pin 4 (IN3), Pin 5 (IN4)");
   Serial.println("Speed: 180/255");
   Serial.println("================================================");
-  Serial.println("Car driving FORWARD...");
+  Serial.println("Car driving BACKWARD...");
 }
 
 void loop() {
-  // Both motors drive forward
-  moveForward();
+  // Both motors drive backward
+  moveBackward();
   delay(100);
 }
 
-// Drive both wheels forward
-void moveForward() {
-  // LEFT motor forward
-  digitalWrite(LEFT_CONTROL, HIGH);
+// Drive both wheels backward
+void moveBackward() {
+  // LEFT motor backward
+  digitalWrite(LEFT_CONTROL, LOW);
   
-  // RIGHT motor forward
-  digitalWrite(RIGHT_DIR, HIGH);
+  // RIGHT motor backward
+  digitalWrite(RIGHT_DIR, LOW);
   analogWrite(RIGHT_SPEED, SPEED);
 }
 
